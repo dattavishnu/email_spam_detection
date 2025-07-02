@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phishing Detector</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>🔍 Phishing Detector</h1>
+    <button id="darkModeToggle" aria-label="Toggle dark mode">🌙</button>
+  </header>
+
+  <main>
+    <section id="leftPanel">
+    
+      
+      
+
+      <div id="helpSection">
+        <h2>Help</h2>
+        <ul>
+          <li>Enter text in the classifier to analyze.</li>
+          <li>Click on emails to see details.</li>
+          
+        </ul>
+      </div>
+
+       <div class="myClass" id="result">RESULT</div>
+
+       <div id="WHY">
+        <h2>WHY US</h2>
+        <ul>
+          <li>Much accurate.</li>
+          <li>Easily understandable.</li>
+          <li>Simple design and use.</li>
+          <li>Simple API design.</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <section id="rightPanel">
+      <div id="riskClassifier">
+        <h2>Risk Classifier</h2>
+        <input type="text" id="emailInput" placeholder="Enter email text..." />
+        <button id="analyzeBtn">Analyze</button>
+        <div id="loading" hidden>Analyzing...</div>
+
+        <!-- This shows formatted classifier result -->
+        <div id="classifierResult"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Phishing Detective</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
