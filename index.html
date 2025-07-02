@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phishing Detecter</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>🔍 Phishing Detecter</h1>
+    <button id="darkModeToggle" aria-label="Toggle dark mode">🌙</button>
+  </header>
+
+  <main>
+    <section id="leftPanel">
+      <h2 style="padding:30px">Mail</h2>
+      <div id="emailList" role="list"></div>
+      <canvas id="pieChart"></canvas>
+      <button id="loadDemo">Load Emails</button>
+    </section>
+
+    <section id="rightPanel">
+      <div id="riskClassifier">
+        <h2>Risk Classifier</h2>
+        <input type="text" id="emailInput" placeholder="Enter email text..." />
+        <button id="analyzeBtn">Analyze</button>
+        <div id="loading" hidden>Analyzing...</div>
+        <div id="classifierResult"></div>
+      </div>
+
+      <div id="discussion">
+        <h2>Discussion</h2>
+        <p>This tool helps detect phishing attempts using a smart classifier.</p>
+      </div>
+
+      <div id="helpSection">
+        <h2>Help</h2>
+        <ul>
+          <li>Enter text in the classifier to analyze.</li>
+          <li>Click on emails to see details.</li>
+          <li>Toggle dark mode with the 🌙 button.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Phishing Detective</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
