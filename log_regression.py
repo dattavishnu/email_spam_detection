@@ -1,18 +1,10 @@
 import numpy as np
 import pickle
+from tensorflow.keras.preprocessing.text import Tokenizer
 
 # =========================
-# LOAD TOKENIZER
+# DATASET
 # =========================
-with open("spam_tokenizer.pkl", "rb") as f:
-    tokenizer = pickle.load(f)
-
-vocab_size = len(tokenizer.word_index) + 1
-
-# =========================
-# LOAD DATASET
-# =========================
-# CHANGE THIS PART to your dataset
 texts = [
     "Congratulations you won a free prize",
     "Win cash now click the link",
@@ -23,6 +15,21 @@ texts = [
 ]
 
 labels = [1, 1, 0, 0, 1, 0]  # 1 = Spam, 0 = Ham
+
+# =========================
+# CREATE & SAVE TOKENIZER
+# =========================
+# We create a new tokenizer based on the training data
+tokenizer = Tokenizer()
+tokenizer.fit_on_texts(texts)
+
+# Save the tokenizer so app.py can use it
+with open("spam_tokenizer.pkl", "wb") as f:
+    pickle.dump(tokenizer, f)
+
+print("Tokenizer created and saved to spam_tokenizer.pkl")
+
+vocab_size = len(tokenizer.word_index) + 1
 
 # =========================
 # TEXT → BAG OF WORDS
