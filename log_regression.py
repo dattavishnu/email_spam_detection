@@ -1,29 +1,34 @@
 import numpy as np
 import pickle
+import csv
 from tensorflow.keras.preprocessing.text import Tokenizer
 
 # =========================
-# DATASET
+# LOAD DATASET FROM CSV
 # =========================
-texts = [
-    "Congratulations you won a free prize",
-    "Win cash now click the link",
-    "Hey are we meeting tomorrow",
-    "Please call me when you are free",
-    "Urgent offer claim your reward now",
-    "Let's have lunch today"
-]
+texts = []
+labels = []
 
-labels = [1, 1, 0, 0, 1, 0]  # 1 = Spam, 0 = Ham
+try:
+    with open("spam_dataset.csv", "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            texts.append(row["text"])
+            labels.append(int(row["label_num"]))
+            
+    print(f"Loaded {len(texts)} samples from spam_dataset.csv")
+
+except FileNotFoundError:
+    print("Error: spam_dataset.csv not found! Please run generate_dataset.py first.")
+    exit(1)
 
 # =========================
 # CREATE & SAVE TOKENIZER
 # =========================
-# We create a new tokenizer based on the training data
 tokenizer = Tokenizer()
 tokenizer.fit_on_texts(texts)
 
-# Save the tokenizer so app.py can use it
+# Save the tokenizer
 with open("spam_tokenizer.pkl", "wb") as f:
     pickle.dump(tokenizer, f)
 
@@ -51,16 +56,18 @@ y = np.array(labels)
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 
+# Initialize weights
 W = np.zeros(vocab_size)
 b = 0.0
 
 lr = 0.01
-epochs = 1000
+epochs = 1500  # Increased epochs for better convergence on larger data
 N = X.shape[0]
 
 # =========================
 # TRAINING LOOP
 # =========================
+print("Training model...")
 for epoch in range(epochs):
     z = np.dot(X, W) + b
     y_pred = sigmoid(z)
@@ -96,5 +103,5 @@ def predict(text):
     return prob, label
 
 print("\n--- TESTING ---")
-print(predict("Congratulations you won cash prize"))
-print(predict("Hey are we going to college tomorrow"))
+print(predict("Get rich quick with crypto"))
+print(predict("Let's have dinner tonight"))
