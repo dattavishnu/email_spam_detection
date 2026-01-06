@@ -2,13 +2,15 @@ document.getElementById("analyzeBtn").addEventListener("click", function () {
   const emailText = document.getElementById("emailInput").value.trim();
 
   if (emailText === "") {
-    alert("Please enter some email text to analyze.");
+    alert("Please enter some text to analyze.");
     return;
   }
 
-  document.getElementById("loading").removeAttribute("hidden");
-  // Clear previous results
-  document.getElementById("classifierResult").innerHTML = "";
+  // UI State: Loading
+  document.getElementById("loading").classList.remove("hidden");
+  document.getElementById("emptyState").classList.add("hidden");
+  document.getElementById("classifierResult").classList.add("hidden");
+  document.getElementById("chartWrapper").classList.add("hidden");
 
   const formData = new FormData();
   formData.append("text", emailText);
@@ -24,111 +26,116 @@ document.getElementById("analyzeBtn").addEventListener("click", function () {
       return response.json();
     })
     .then(data => {
-      document.getElementById("result").innerText = JSON.stringify(data, null, 2);
-
-      // Fix: Check if .myClass exists to avoid null reference error if HTML changes
-      const resultDiv = document.querySelector(".myClass");
-      if(resultDiv) {
-        resultDiv.innerText = `Label: ${data.label} | Risk Score: ${parseFloat(data.risk_score).toFixed(4)}`;
-      }
-
-      document.getElementById("classifierResult").innerHTML = `
-        <p><strong>Label:</strong> ${data.label}</p>
-        <p><strong>Risk Score:</strong> ${parseFloat(data.risk_score).toFixed(4)}</p>
-      `;
-
-      document.getElementById("loading").setAttribute("hidden", true);
-
-      // --- Chart & Risk Label Logic (Moved inside .then) ---
-      
-      const score = parseFloat(data.risk_score);
-      const pieData = {
-        high: score >= 0.7 ? score : 0,
-        medium: score >= 0.4 && score < 0.7 ? score : 0,
-        low: score < 0.4 ? score : 0
-      };
-
-      // Calculate "Safety" score for the chart (remainder up to 1.0)
-      // If score is 0.8 (High risk), Safety is 0.2
-      // We will categorize the risk for the chart display logic
-      
-      renderPieChart(score);
-      updateRiskLabel(score);
-
+      // Simulate a small delay for "AI processing" feel
+      setTimeout(() => {
+        displayResult(data);
+      }, 500);
     })
     .catch(error => {
       console.error("Error:", error);
-      document.getElementById("classifierResult").innerText = "An error occurred.";
-      document.getElementById("loading").setAttribute("hidden", true);
+      alert("An error occurred while communicating with the server.");
+      document.getElementById("loading").classList.add("hidden");
+      document.getElementById("emptyState").classList.remove("hidden");
     });
 });
 
-let myPieChart; // Global variable to store the chart instance
+document.getElementById("darkModeToggle").addEventListener("click", function () {
+  document.body.classList.toggle("dark");
+  // Re-render chart to update colors for dark mode if result exists
+  const resultVisible = !document.getElementById("classifierResult").classList.contains("hidden");
+  if (resultVisible && window.lastScore !== undefined) {
+    renderPieChart(window.lastScore);
+  }
+});
+
+let myPieChart;
+
+function displayResult(data) {
+  document.getElementById("loading").classList.add("hidden");
+  document.getElementById("classifierResult").classList.remove("hidden");
+  document.getElementById("chartWrapper").classList.remove("hidden");
+
+  const score = parseFloat(data.risk_score);
+  const label = data.label; // "Spam" or "Ham"
+  window.lastScore = score; // Store for theme toggling
+
+  // Update Text Elements
+  const badge = document.getElementById("badgeLabel");
+  const scoreVal = document.getElementById("scoreValue");
+  const msg = document.getElementById("resultMessage");
+
+  // Format Score
+  scoreVal.innerText = (score * 100).toFixed(2) + "%";
+
+  // Styles based on risk
+  badge.className = "badge"; // reset
+  if (label === "Spam") {
+    badge.classList.add("danger");
+    badge.innerText = "Spam Detected";
+    msg.innerText = "This message shows high probability of being malicious.";
+  } else {
+    badge.classList.add("safe");
+    badge.innerText = "Safe";
+    msg.innerText = "This message appears to be legitimate.";
+  }
+
+  renderPieChart(score);
+}
 
 function renderPieChart(riskScore) {
   const ctx = document.getElementById('pieChart').getContext('2d');
-  
-  // Destroy previous chart if it exists
+
   if (myPieChart) {
     myPieChart.destroy();
   }
 
-  // Determine color based on risk
-  let riskColor;
-  if (riskScore >= 0.7) riskColor = '#ff6384'; // Red
-  else if (riskScore >= 0.4) riskColor = '#ffcd56'; // Yellow
-  else riskColor = '#36a2eb'; // Blue/Greenish
+  const isDark = document.body.classList.contains("dark");
 
-  const safetyScore = Math.max(0, 1 - riskScore);
+  // Vibrant Colors matching CSS Gradients
+  // Danger: #ff5f6d, Safe: #43e97b
+  const riskColor = '#ff5f6d';
+  const safeColor = '#43e97b';
+  const emptyColor = isDark ? '#374151' : '#e2e8f0'; // Gray-700 / Gray-200
+
+  // Chart Data Logic
+  // If Risk > 0.5 (Spam), we show the Risk % in Red.
+  // If Risk < 0.5 (Safe), we show the Safety % (1-Risk) in Green.
+
+  let chartData, chartColors;
+
+  if (riskScore > 0.5) {
+    // Spam Case: Show Risk
+    chartData = [riskScore, 1 - riskScore];
+    chartColors = [riskColor, emptyColor];
+  } else {
+    // Safe Case: Show Safety Score primarily
+    chartData = [(1 - riskScore), riskScore];
+    chartColors = [safeColor, emptyColor];
+  }
 
   myPieChart = new Chart(ctx, {
-    type: 'pie',
+    type: 'doughnut',
     data: {
-      labels: ['Risk', 'Safety'],
+      labels: ['Score', 'Remaining'],
       datasets: [{
-        data: [riskScore, safetyScore],
-        backgroundColor: [
-            riskColor,
-            '#4bc0c0' // Green/Teal for safety
-        ],
-        borderWidth: 1
+        data: chartData,
+        backgroundColor: chartColors,
+        borderWidth: 0,
+        hoverOffset: 4
       }]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
+      cutout: '80%', // Thinner ring
       plugins: {
-        legend: {
-          position: 'bottom',
-        },
-        title: {
-          display: true,
-          text: 'Risk Probability'
-        }
+        legend: { display: false },
+        tooltip: { enabled: false }
+      },
+      animation: {
+        animateScale: true,
+        animateRotate: true
       }
     }
   });
-}
-
-function updateRiskLabel(score) {
-  const resultDiv = document.getElementById("result");
-  if (!resultDiv) return;
-
-  let riskLevel = "Low";
-  let color = "green";
-
-  if (score >= 0.7) {
-    riskLevel = "High";
-    color = "red";
-  } else if (score >= 0.4) {
-    riskLevel = "Medium";
-    color = "orange";
-  }
-
-  // We can update the styling of the main result box based on risk
-  resultDiv.style.borderColor = color;
-  resultDiv.style.borderWidth = "2px";
-  resultDiv.style.borderStyle = "solid";
-  
-  // Optionally append the text logic if not already done in the main flow
-  // (We already set the text in the main flow, so just updating style here is good)
 }
