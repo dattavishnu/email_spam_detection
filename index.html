@@ -1,64 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Phishing Detector</title>
+  <title>Spam Guard AI</title>
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
-  <header>
-    <h1>🔍 Phishing Detector</h1>
-    <button id="darkModeToggle" aria-label="Toggle dark mode">🌙</button>
-  </header>
 
-  <main>
-    <section id="leftPanel">
-    
-      
-      
-
-      <div id="helpSection">
-        <h2>Help</h2>
-        <ul>
-          <li>Enter text in the classifier to analyze.</li>
-          <li>Click on emails to see details.</li>
-          
-        </ul>
+  <div class="layout">
+    <!-- Sidebar / Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="icon">🛡️</span>
+        <span class="text">SpamGuard AI</span>
       </div>
-
-       <div class="myClass" id="result">RESULT</div>
-
-       <div id="WHY">
-        <h2>WHY US</h2>
-        <ul>
-          <li>Much accurate.</li>
-          <li>Easily understandable.</li>
-          <li>Simple design and use.</li>
-          <li>Simple API design.</li>
-        </ul>
+      <nav>
+        <a href="#" class="nav-item active">Dashboard</a>
+        <a href="#" class="nav-item">History</a>
+        <a href="#" class="nav-item">Settings</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="darkModeToggle" class="btn-ghost" aria-label="Toggle dark mode">
+          <span class="mode-icon">🌙</span> Dark Mode
+        </button>
       </div>
-    </section>
+    </aside>
 
+    <!-- Main Content -->
+    <main class="content">
+      <header class="header">
+        <h1>Dashboard</h1>
+        <p class="subtitle">Real-time threat detection and analysis.</p>
+      </header>
 
-    <section id="rightPanel">
-      <div id="riskClassifier">
-        <h2>Risk Classifier</h2>
-        <input type="text" id="emailInput" placeholder="Enter email text..." />
-        <button id="analyzeBtn">Analyze</button>
-        <div id="loading" hidden>Analyzing...</div>
+      <div class="grid-container">
+        <!-- Input Card -->
+        <div class="card input-card">
+          <div class="card-header">
+            <h3>Analyze Message</h3>
+            <p>Paste email content or SMS text below.</p>
+          </div>
+          <div class="card-content">
+            <textarea id="emailInput" placeholder="Enter message text..."></textarea>
+          </div>
+          <div class="card-footer">
+            <button id="analyzeBtn" class="btn-primary">Check for Spam</button>
+          </div>
+        </div>
 
-        <!-- This shows formatted classifier result -->
-        <div id="classifierResult"></div>
+        <!-- Result Card -->
+        <div class="card result-card">
+          <div class="card-header">
+            <h3>Analysis Result</h3>
+            <p>AI Probabilistic Assessment</p>
+          </div>
+          <div class="card-content centered">
+            <!-- Loading State -->
+            <div id="loading" class="hidden">
+              <div class="spinner"></div>
+              <p>analyzing vectors...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState">
+              <p>Waiting for input...</p>
+            </div>
+
+            <!-- Result Content -->
+            <div id="classifierResult" class="hidden">
+              <div id="badgeLabel" class="badge">Safe</div>
+              <div class="score-display">
+                <span id="scoreValue">0.00%</span>
+                <span class="score-label">Risk Score</span>
+              </div>
+              <p id="resultMessage">This message looks clean.</p>
+            </div>
+
+            <div class="chart-container hidden" id="chartWrapper">
+              <canvas id="pieChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="card info-card">
+          <div class="card-header">
+            <h3>Model Stats</h3>
+          </div>
+          <div class="card-content">
+            <div class="stat-row">
+              <span>Algorithm</span>
+              <span class="stat-val">Logistic Regression</span>
+            </div>
+            <div class="stat-row">
+              <span>Tokenizer</span>
+              <span class="stat-val">TF-IDF / BoW</span>
+            </div>
+            <div class="stat-row">
+              <span>Accuracy</span>
+              <span class="stat-val">96.7%</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
-  </main>
-
-  <footer>
-    <p>&copy; 2025 Phishing Detective</p>
-  </footer>
+    </main>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js"></script>
 </body>
+
 </html>
